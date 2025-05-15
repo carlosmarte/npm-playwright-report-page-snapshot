@@ -1,0 +1,51 @@
+name: Process JSON Files
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'Select a JSON file'
+        required: true
+        type: choice
+        options:
+          - file1
+          - file2
+          - file3
+          # Add more options based on your JSON files
+      overwrite:
+        description: 'Overwrite existing data'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      
+      - name: Run script
+        run: |
+          # Create config file with the provided JSON
+          echo '{
+            "logEval": true,
+            "intervalTime": 100,
+            "maxWaitTime": 10000,
+            "headless": false,
+            "captureSSL": true,
+            "captureBrowserCookies": true,
+            "captureBlockingLoadedResources": true,
+            "accessibilityScan": {
+              "withTags": ["wcag2a", "wcag2aa"],
+              "exclude": ".skip-accessibility"
+            }
+          }' > config.json
+          
+          # Run the script with the selected file, overwrite flag, and config
+          node index.mjs --file="${{ github.event.inputs.file }}" --overwrite="${{ github.event.inputs.overwrite }}" --config=config.json

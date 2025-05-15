@@ -1,0 +1,63 @@
+{
+  "defaultOptions": {
+    "url": "https://developer.chrome.com/new",
+    "outputDir": "./reports",
+    "onLoadCaptureVariables": ["document.title"],
+    "listenToWindowVariables": ["angular.version", "jQuery", "React"],
+    "listenToWindowFunctions": ["fetch", "XMLHttpRequest"],
+    "logEval": true,
+    "intervalTime": 100,
+    "maxWaitTime": 10000,
+    "headless": false,
+    "captureSSL": true,
+    "captureBrowserCookies": true,
+    "captureBlockingLoadedResources": true,
+    "accessibilityScan": {
+      "withTags": ["wcag2a", "wcag2aa"],
+      "exclude": ".skip-accessibility"
+    },
+    "execute": [
+      {
+        "name": "captureMetaTags",
+        "description": "Captures all meta tags from the page",
+        "code": "async ({ results, page }) => {\n  console.log('Capturing meta tags');\n  const metaTags = await page.evaluate(() => {\n    return Array.from(document.querySelectorAll('meta')).map(meta => ({\n      name: meta.getAttribute('name'),\n      property: meta.getAttribute('property'),\n      content: meta.getAttribute('content')\n    }));\n  });\n  return { metaTags };\n}"
+      },
+      {
+        "name": "capturePageTitle",
+        "description": "Captures the page title",
+        "code": "async ({ results, page }) => {\n  console.log('Capturing page title');\n  const title = await page.title();\n  return { title };\n}"
+      },
+      {
+        "name": "capturePagePerformance",
+        "description": "Captures detailed performance metrics",
+        "code": "async ({ results, page }) => {\n  console.log('Capturing performance metrics');\n  const metrics = await page.evaluate(() => {\n    if (!performance || !performance.getEntriesByType) return {};\n    return {\n      navigation: performance.getEntriesByType('navigation'),\n      resource: performance.getEntriesByType('resource'),\n      paint: performance.getEntriesByType('paint'),\n      mark: performance.getEntriesByType('mark'),\n      measure: performance.getEntriesByType('measure')\n    };\n  });\n  return { performanceDetails: metrics };\n}"
+      },
+      {
+        "name": "captureLocalStorage",
+        "description": "Captures all localStorage items",
+        "code": "async ({ results, page }) => {\n  console.log('Capturing localStorage');\n  const storage = await page.evaluate(() => {\n    const items = {};\n    for (let i = 0; i < localStorage.length; i++) {\n      const key = localStorage.key(i);\n      items[key] = localStorage.getItem(key);\n    }\n    return items;\n  });\n  return { localStorage: storage };\n}"
+      },
+      {
+        "name": "captureSessionStorage",
+        "description": "Captures all sessionStorage items",
+        "code": "async ({ results, page }) => {\n  console.log('Capturing sessionStorage');\n  const storage = await page.evaluate(() => {\n    const items = {};\n    for (let i = 0; i < sessionStorage.length; i++) {\n      const key = sessionStorage.key(i);\n      items[key] = sessionStorage.getItem(key);\n    }\n    return items;\n  });\n  return { sessionStorage: storage };\n}"
+      }
+    ]
+  },
+  "resourceTypes": [
+    "document",
+    "stylesheet",
+    "image",
+    "media",
+    "font",
+    "script",
+    "texttrack",
+    "xhr",
+    "fetch",
+    "eventsource",
+    "websocket",
+    "manifest",
+    "other"
+  ],
+  "enhanceListeners": {}
+}
