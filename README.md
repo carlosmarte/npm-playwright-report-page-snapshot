@@ -1,0 +1,1 @@
+# npm-playwright-report-page-snapshot
